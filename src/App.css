@@ -1,0 +1,16 @@
+.app-container {
+	margin-top: 64px;
+	overflow-x: hidden;
+}
+
+a {
+	text-decoration: none;
+}
+
+.w-color-text {
+	color: #ffffff;
+}
+
+.b-color-text {
+	color: #000000;
+}
