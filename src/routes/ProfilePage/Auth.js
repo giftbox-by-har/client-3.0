@@ -8,7 +8,6 @@ const Auth = ({ setIsAuthenticated }) => {
 	const [password, setPassword] = useState("");
 	const [isLogin, setIsLogin] = useState(true);
 
-
 	const handleLogin = async () => {
 		try {
 			const response = await axios.post(`${baseUrl}/auth/login`, {
@@ -37,7 +36,6 @@ const Auth = ({ setIsAuthenticated }) => {
 			localStorage.setItem("accessToken", response.data.accessToken);
 			console.log(response.data);
 			setIsAuthenticated(true);
-
 		} catch (error) {
 			console.error(error);
 		}
@@ -51,35 +49,88 @@ const Auth = ({ setIsAuthenticated }) => {
 	};
 
 	return (
-		<div>
-			{isLogin ? <h2>Login</h2> : <h2>Register</h2>}
-			{!isLogin && (
-				<input
-					type="text"
-					placeholder="Name"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-				/>
-			)}
-			<input
-				type="email"
-				placeholder="Email"
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-			/>
-			<input
-				type="password"
-				placeholder="Password"
-				value={password}
-				onChange={(e) => setPassword(e.target.value)}
-			/>
-			<button onClick={isLogin ? handleLogin : handleRegister}>
-				{isLogin ? "Login" : "Register"}
-			</button>
-			<p>
-				{isLogin ? "Belum punya akun? " : "Sudah punya akun? "}
-				<button onClick={handleSwitch}>{isLogin ? "Register" : "Login"}</button>
-			</p>
+		<div
+			className="customgift-container"
+			style={{
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+				height: "calc(100vh - 64px)",
+			}}
+		>
+			<div
+				style={{
+					background: "white",
+					padding: "8px",
+					borderRadius: "16px",
+					boxSizing: "border-box",
+				}}
+			>
+				{isLogin ? (
+					<h2 style={{ textAlign: "center" }}>Masuk</h2>
+				) : (
+					<h2 style={{ textAlign: "center" }}>Registrasi</h2>
+				)}
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "flex-end",
+						margin: "0 8px",
+					}}
+				>
+					<button
+						onClick={handleSwitch}
+						style={{
+							padding: "4px",
+							borderRadius: "16px",
+							cursor: "pointer",
+							background: "transparent",
+						}}
+					>
+						{isLogin ? "Registrasi" : "Login"}
+					</button>
+				</div>
+				<div>
+					{!isLogin && (
+						<input
+							type="text"
+							placeholder="Name"
+							className="inputproduct-input"
+							style={{ width: "320px" }}
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
+					)}
+				</div>
+				<div>
+					<input
+						type="email"
+						placeholder="Email"
+						className="inputproduct-input"
+						style={{ width: "320px" }}
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+					/>
+				</div>
+				<div>
+					<input
+						type="password"
+						placeholder="Password"
+						className="inputproduct-input"
+						style={{ width: "320px" }}
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+					/>
+				</div>
+				<div>
+					<button
+						className="inputproduct-button"
+						onClick={isLogin ? handleLogin : handleRegister}
+					>
+						{isLogin ? "Masuk" : "Registrasi"}
+					</button>
+				</div>
+			</div>
 		</div>
 	);
 };

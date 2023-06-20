@@ -4,7 +4,12 @@ import LoadScreen from "../../components/LoadScreen/LoadScreen";
 import ImageViewer from "../../components/ImageViewer/ImageViewer";
 import { baseUrl } from "../../config";
 
-const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
+const DetailCustomGitPage = ({
+	productId,
+	setSelectedProductId,
+	selectedProducts,
+	setSelectedProducts,
+}) => {
 	const [product, setProduct] = useState(null);
 	const [selectedVariant, setSelectedVariant] = useState("");
 	const [customImage, setCustomImage] = useState("");
@@ -34,8 +39,55 @@ const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
 		try {
 			const response = await axios.get(`${baseUrl}/products/${productId}`);
 			setProduct(response.data);
+			const existingProduct = selectedProducts.find(
+				(selectedProduct) => selectedProduct._id === response.data._id
+			);
+
+			if (existingProduct) {
+				setSelectedVariant(existingProduct.selectedVariant);
+				setCustomText(existingProduct.customText);
+			} else if (response.data.variantType.length > 0) {
+				setSelectedVariant(response.data.variantType[0]);
+			}
 		} catch (error) {
 			console.error(error);
+		}
+	};
+
+	const handleSelectProduct = async () => {
+		const existingProduct = selectedProducts.find(
+			(selectedProduct) => selectedProduct._id === product._id
+		);
+
+		if (existingProduct) {
+			const updatedSelectedProducts = selectedProducts.map(
+				(selectedProduct) => {
+					if (selectedProduct._id === product._id) {
+						return {
+							...selectedProduct,
+							quantity: selectedProduct.quantity + 1,
+							selectedVariant: selectedVariant,
+							customText: customText,
+						};
+					}
+					return selectedProduct;
+				}
+			);
+
+			setSelectedProducts(updatedSelectedProducts);
+			setSelectedProductId(null);
+		} else {
+			// Jika produk belum ada, tambahkan produk ke selectedProducts dengan quantity 1
+			setSelectedProducts((selectedProducts) => [
+				...selectedProducts,
+				{
+					...product,
+					quantity: 1,
+					selectedVariant: selectedVariant,
+					customText: customText,
+				},
+			]);
+			setSelectedProductId(null);
 		}
 	};
 
@@ -110,19 +162,6 @@ const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
 								</div>
 							</div>
 							<div className="adminpage-detail-container-layout">
-								{/* {product.category && (
-									<div>
-										<p>
-											<span style={{ fontWeight: "bold" }}>Kategori:</span>
-											&nbsp;
-											{product.category.length > 0 && (
-												<span style={{ display: "inline" }}>
-													{product.category.join(", ")}
-												</span>
-											)}
-										</p>
-									</div>
-								)} */}
 								{product.description && (
 									<div>
 										<p style={{ fontWeight: "bold" }}>Deskripsi:</p>
@@ -154,7 +193,7 @@ const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
 														/>
 													</div>
 												)}
-												{customize === "Images" && (
+												{/* {customize === "Images" && (
 													<div>
 														{customImage ? (
 															<>
@@ -178,7 +217,7 @@ const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
 															<input type="file" onChange={handleImageUpload} />
 														)}
 													</div>
-												)}
+												)} */}
 											</div>
 										))}
 									</div>
@@ -192,7 +231,10 @@ const DetailCustomGitPage = ({ productId, setSelectedProductId }) => {
 								>
 									<button
 										className="adminpage-detail-button"
-										onClick={handleBackClick}
+										onClick={handleSelectProduct}
+										disabled={
+											(product.variantType.length > 0 && !selectedVariant)
+										}
 									>
 										Tambah Produk
 									</button>

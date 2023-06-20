@@ -1,0 +1,25 @@
+.homepage-container {
+	background-image: url("../../../public/bg-web.png");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	width: 100vw;
+	height: calc(100vh - 64px);
+}
+
+.homepage-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media only screen and (max-width: 768px) {
+    .homepage-content{
+        display: block;
+        text-align: center;
+        padding: 0 8px;
+    }
+    .homepage-content div{
+        width: 100%!important;
+    }
+}

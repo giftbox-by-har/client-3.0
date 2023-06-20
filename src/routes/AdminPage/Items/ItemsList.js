@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import ProductList from "./Product/ProductList";
-import InputBoxForm from "./Box/InputBoxForm";
-import InputPackageForm from "./Package/InputPackageForm";
 import BoxList from "./Box/BoxList";
-import PackageList from "./Package/PackageList";
 
 const ItemsList = () => {
 	const [activeComponent, setActiveComponent] = useState("productList");
@@ -18,8 +15,6 @@ const ItemsList = () => {
 				return <ProductList />;
 			case "boxTypesList":
 				return <BoxList />;
-			case "packageList":
-				return <PackageList />;
 			default:
 				return null;
 		}
@@ -42,14 +37,6 @@ const ItemsList = () => {
 						onClick={() => handleComponentChange("boxTypesList")}
 					>
 						Kotak
-					</button>
-				</div>
-				<div>
-					<button
-						className={activeComponent === "packageList" ? "active" : ""}
-						onClick={() => handleComponentChange("packageList")}
-					>
-						Paket
 					</button>
 				</div>
 			</div>

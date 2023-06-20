@@ -8,13 +8,14 @@ const DetailProductPage = ({ productId, setSelectedProductId }) => {
 	const [product, setProduct] = useState(null);
 
 	useEffect(() => {
+		console.log(productId);
 		fetchProduct();
 	}, []);
 
 	const fetchProduct = async () => {
 		try {
 			const response = await axios.get(
-				`${baseUrl}/${productId}`
+				`${baseUrl}/products/${productId}`
 			);
 			setProduct(response.data);
 		} catch (error) {

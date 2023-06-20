@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DetailCustomGitPage from "./DetailCustomGitPage";
 import { baseUrl } from "../../config";
+import { checkProductFitsInBox } from "./boxUtils";
 
 const CustomGiftPage2 = ({
 	selectedBox,
@@ -9,43 +10,36 @@ const CustomGiftPage2 = ({
 	setSelectedProducts,
 }) => {
 	const [products, setProducts] = useState([]);
+	const [recomendations, setRecomendations] = useState([]);
 	const [search, setSearch] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedProductId, setSelectedProductId] = useState(null);
-	const [newLengthBox, setNewLengthBox] = useState(null);
-	const [newWidthBox, setNewWidthBox] = useState(null);
-	const [newHeightBox, setNewHeightBox] = useState(null);
 
 	useEffect(() => {
 		fetchProducts();
-		// availabilityProduct();
 	}, [search]);
 
-	// const availabilityProduct = () => {
-	// 	setNewHeightBox(selectedBox.dimension.height);
-	// 	setNewWidthBox(selectedBox.dimension.width);
-	// 	setNewLengthBox(selectedBox.dimension.length);
-	// };
-
-	// useEffect(() => {
-	// 	console.log(newLengthBox);
-	// 	console.log(newWidthBox);
-	// 	console.log(newHeightBox);
-	// }, [newLengthBox, newWidthBox, newHeightBox]);
-
-
 	const fetchProducts = async () => {
+		let userData = null;
+		const userDataString = localStorage.getItem("userData");
+
+		if (userDataString) {
+			userData = JSON.parse(userDataString).user;
+		} else {
+		}
+
 		try {
 			setIsLoading(true);
 			const response = await axios.get(`${baseUrl}/products/`, {
 				params: {
 					search: search,
-					boxType: selectedBox,
-					products: selectedProducts,
+					user: userData,
 				},
 			});
 
-			setProducts(response.data);
+			setProducts(response.data.products);
+			setRecomendations(response.data.recommendations);
+			console.log(response.data.recommendations);
 			setIsLoading(false);
 		} catch (error) {
 			console.error(error);
@@ -71,6 +65,17 @@ const CustomGiftPage2 = ({
 			(selectedProduct) => selectedProduct._id === product._id
 		);
 
+		const fitsInBox = checkProductFitsInBox(
+			product,
+			selectedBox,
+			selectedProducts
+		);
+
+		if (!fitsInBox) {
+			console.log("Selected product dimensions exceed box dimensions");
+			return;
+		}
+
 		if (existingProduct) {
 			const updatedSelectedProducts = selectedProducts.map(
 				(selectedProduct) => {
@@ -86,7 +91,6 @@ const CustomGiftPage2 = ({
 
 			setSelectedProducts(updatedSelectedProducts);
 		} else {
-			// Jika produk belum ada, tambahkan produk ke selectedProducts dengan quantity 1
 			setSelectedProducts((selectedProducts) => [
 				...selectedProducts,
 				{
@@ -107,7 +111,6 @@ const CustomGiftPage2 = ({
 							quantity: selectedProduct.quantity - 1,
 						};
 					} else {
-						// Kuantitas produk sudah 1, hapus produk dari selectedProducts
 						return null;
 					}
 				}
@@ -125,6 +128,8 @@ const CustomGiftPage2 = ({
 					<DetailCustomGitPage
 						productId={selectedProductId}
 						setSelectedProductId={setSelectedProductId}
+						selectedProducts={selectedProducts}
+						setSelectedProducts={setSelectedProducts}
 					/>
 				</div>
 			)}
@@ -157,9 +162,10 @@ const CustomGiftPage2 = ({
 					{products.length === 0 && (
 						<p>Produk yang Anda cari tidak ditemukan.</p>
 					)}
-					{products && (
+					{recomendations.length > 0 && (
 						<div>
-							{products.map((product) => (
+							<p> Rekomendasi untukmu:</p>
+							{recomendations.map((product) => (
 								<div key={product._id} className="customgift-card">
 									<div
 										style={{ display: "flex", justifyContent: "center" }}
@@ -174,6 +180,24 @@ const CustomGiftPage2 = ({
 									</div>
 									<div>
 										<h4>{product.productName}</h4>
+
+										<div>
+											{selectedProducts.find(
+												(selectedProduct) => selectedProduct._id === product._id
+											)?.selectedVariant ? (
+												<div>
+													variasi:{" "}
+													{
+														selectedProducts.find(
+															(selectedProduct) =>
+																selectedProduct._id === product._id
+														).selectedVariant
+													}
+												</div>
+											) : (
+												<div></div>
+											)}
+										</div>
 										<p>
 											{product.price.toLocaleString("id-ID", {
 												style: "currency",
@@ -182,15 +206,138 @@ const CustomGiftPage2 = ({
 										</p>
 									</div>
 									{product.variants ? (
-										<button className="customgift-buttoncard">
-											pilih variasi
-										</button>
+										<div>
+											{selectedProducts.find(
+												(selectedProduct) => selectedProduct._id === product._id
+											) ? (
+												<div style={{ display: "flex" }}>
+													<button
+														onClick={(e) => {
+															e.stopPropagation();
+															handleRemoveProduct(product);
+														}}
+														className="customgift-buttoncard"
+													>
+														-
+													</button>
+													<span
+														style={{
+															padding: "0 16px",
+															display: "flex",
+															alignItems: "center",
+														}}
+													>
+														{
+															selectedProducts.find(
+																(selectedProduct) =>
+																	selectedProduct._id === product._id
+															).quantity
+														}
+													</span>
+													<button
+														onClick={(e) => {
+															e.stopPropagation();
+															handleSelectProduct(product);
+														}}
+														className="customgift-buttoncard"
+														disabled={
+															!checkProductFitsInBox(
+																product,
+																selectedBox,
+																selectedProducts
+															)
+														}
+													>
+														+
+													</button>
+												</div>
+											) : (
+												<button
+													className="customgift-buttoncard"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleProductClick(product._id);
+													}}
+													disabled={
+														!checkProductFitsInBox(
+															product,
+															selectedBox,
+															selectedProducts
+														)
+													}
+												>
+													Pilih Variasi
+												</button>
+											)}
+										</div>
 									) : (
 										<div>
 											{product.customize ? (
-												<button className="customgift-buttoncard">
-													Kustom Produk
-												</button>
+												<div>
+													{selectedProducts.find(
+														(selectedProduct) =>
+															selectedProduct._id === product._id
+													) ? (
+														<div style={{ display: "flex" }}>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleRemoveProduct(product);
+																}}
+																className="customgift-buttoncard"
+															>
+																-
+															</button>
+															<span
+																style={{
+																	padding: "0 16px",
+																	display: "flex",
+																	alignItems: "center",
+																}}
+															>
+																{
+																	selectedProducts.find(
+																		(selectedProduct) =>
+																			selectedProduct._id === product._id
+																	).quantity
+																}
+															</span>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleSelectProduct(product);
+																}}
+																className="customgift-buttoncard"
+																disabled={
+																	!checkProductFitsInBox(
+																		product,
+																		selectedBox,
+																		selectedProducts
+																	)
+																}
+															>
+																+
+															</button>
+														</div>
+													) : (
+														<button
+															className="customgift-buttoncard"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleProductClick(product._id);
+															}}
+															disabled={
+																!checkProductFitsInBox(
+																	product,
+																	selectedBox,
+																	selectedProducts
+																)
+															}
+														>
+															Pesan Sekarang
+														</button>
+													)}
+												</div>
 											) : (
 												<div>
 													{selectedProducts.find(
@@ -227,19 +374,282 @@ const CustomGiftPage2 = ({
 																	handleSelectProduct(product);
 																}}
 																className="customgift-buttoncard"
+																disabled={
+																	!checkProductFitsInBox(
+																		product,
+																		selectedBox,
+																		selectedProducts
+																	)
+																}
 															>
 																+
 															</button>
 														</div>
 													) : (
 														<button
+															className="customgift-buttoncard"
 															onClick={(e) => {
 																e.stopPropagation();
 																handleSelectProduct(product);
 															}}
-															className="customgift-buttoncard"
+															disabled={
+																!checkProductFitsInBox(
+																	product,
+																	selectedBox,
+																	selectedProducts
+																)
+															}
 														>
-															Pilih Produk
+															Pilih
+														</button>
+													)}
+												</div>
+											)}
+										</div>
+									)}
+								</div>
+							))}
+							<hr />
+						</div>
+					)}
+					{products && (
+						<div>
+							{products.map((product) => (
+								<div key={product._id} className="customgift-card">
+									<div
+										style={{ display: "flex", justifyContent: "center" }}
+										onClick={() => handleProductClick(product._id)}
+									>
+										<img
+											key={product.images[0]}
+											src={`${baseUrl}/${product.images[0]}`}
+											alt={product.productName}
+											style={{ width: "144px", height: "144px" }}
+										/>
+									</div>
+									<div>
+										<h4>{product.productName}</h4>
+
+										<div>
+											{selectedProducts.find(
+												(selectedProduct) => selectedProduct._id === product._id
+											)?.selectedVariant ? (
+												<div>
+													variasi:{" "}
+													{
+														selectedProducts.find(
+															(selectedProduct) =>
+																selectedProduct._id === product._id
+														).selectedVariant
+													}
+												</div>
+											) : (
+												<div></div>
+											)}
+										</div>
+										<p>
+											{product.price.toLocaleString("id-ID", {
+												style: "currency",
+												currency: "IDR",
+											})}
+										</p>
+									</div>
+									{product.variants ? (
+										<div>
+											{selectedProducts.find(
+												(selectedProduct) => selectedProduct._id === product._id
+											) ? (
+												<div style={{ display: "flex" }}>
+													<button
+														onClick={(e) => {
+															e.stopPropagation();
+															handleRemoveProduct(product);
+														}}
+														className="customgift-buttoncard"
+													>
+														-
+													</button>
+													<span
+														style={{
+															padding: "0 16px",
+															display: "flex",
+															alignItems: "center",
+														}}
+													>
+														{
+															selectedProducts.find(
+																(selectedProduct) =>
+																	selectedProduct._id === product._id
+															).quantity
+														}
+													</span>
+													<button
+														onClick={(e) => {
+															e.stopPropagation();
+															handleSelectProduct(product);
+														}}
+														className="customgift-buttoncard"
+														disabled={
+															!checkProductFitsInBox(
+																product,
+																selectedBox,
+																selectedProducts
+															)
+														}
+													>
+														+
+													</button>
+												</div>
+											) : (
+												<button
+													className="customgift-buttoncard"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleProductClick(product._id);
+													}}
+													disabled={
+														!checkProductFitsInBox(
+															product,
+															selectedBox,
+															selectedProducts
+														)
+													}
+												>
+													Pilih Variasi
+												</button>
+											)}
+										</div>
+									) : (
+										<div>
+											{product.customize ? (
+												<div>
+													{selectedProducts.find(
+														(selectedProduct) =>
+															selectedProduct._id === product._id
+													) ? (
+														<div style={{ display: "flex" }}>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleRemoveProduct(product);
+																}}
+																className="customgift-buttoncard"
+															>
+																-
+															</button>
+															<span
+																style={{
+																	padding: "0 16px",
+																	display: "flex",
+																	alignItems: "center",
+																}}
+															>
+																{
+																	selectedProducts.find(
+																		(selectedProduct) =>
+																			selectedProduct._id === product._id
+																	).quantity
+																}
+															</span>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleSelectProduct(product);
+																}}
+																className="customgift-buttoncard"
+																disabled={
+																	!checkProductFitsInBox(
+																		product,
+																		selectedBox,
+																		selectedProducts
+																	)
+																}
+															>
+																+
+															</button>
+														</div>
+													) : (
+														<button
+															className="customgift-buttoncard"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleProductClick(product._id);
+															}}
+															disabled={
+																!checkProductFitsInBox(
+																	product,
+																	selectedBox,
+																	selectedProducts
+																)
+															}
+														>
+															Pesan Sekarang
+														</button>
+													)}
+												</div>
+											) : (
+												<div>
+													{selectedProducts.find(
+														(selectedProduct) =>
+															selectedProduct._id === product._id
+													) ? (
+														<div style={{ display: "flex" }}>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleRemoveProduct(product);
+																}}
+																className="customgift-buttoncard"
+															>
+																-
+															</button>
+															<span
+																style={{
+																	padding: "0 16px",
+																	display: "flex",
+																	alignItems: "center",
+																}}
+															>
+																{
+																	selectedProducts.find(
+																		(selectedProduct) =>
+																			selectedProduct._id === product._id
+																	).quantity
+																}
+															</span>
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleSelectProduct(product);
+																}}
+																className="customgift-buttoncard"
+																disabled={
+																	!checkProductFitsInBox(
+																		product,
+																		selectedBox,
+																		selectedProducts
+																	)
+																}
+															>
+																+
+															</button>
+														</div>
+													) : (
+														<button
+															className="customgift-buttoncard"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleSelectProduct(product);
+															}}
+															disabled={
+																!checkProductFitsInBox(
+																	product,
+																	selectedBox,
+																	selectedProducts
+																)
+															}
+														>
+															Pilih
 														</button>
 													)}
 												</div>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { baseUrl } from "../../config";
+import DetailBoxCustomGiftPage from "./DetailBoxCustomGiftPage";
 
 const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 	const [boxTypes, setBoxTypes] = useState([]);
+	const [selectedBoxId, setSelectedBoxId] = useState(null);
 
 	useEffect(() => {
 		fetchBoxTypes();
@@ -13,7 +15,7 @@ const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 		try {
 			const response = await axios.get(`${baseUrl}/box-types`);
 			setBoxTypes(response.data);
-			console.log("Box types retrieved successfully");
+			// console.log("Box types retrieved successfully");
 		} catch (error) {
 			console.error(error);
 		}
@@ -24,8 +26,24 @@ const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 		setCurrentPage((prevPage) => prevPage + 1);
 	};
 
+	const handleBoxClick = (boxId) => {
+		setSelectedBoxId(boxId);
+	};
+
 	return (
 		<div>
+			{selectedBoxId && (
+				<div>
+					<DetailBoxCustomGiftPage
+						boxId={selectedBoxId}
+						setSelectedBoxId={setSelectedBoxId}
+						setSelectedBox={setSelectedBox}
+						setCurrentPage={setCurrentPage}
+						selectedBox={selectedBox}
+					/>
+				</div>
+			)}
+
 			<h2 style={{ textAlign: "center" }}>Kotak Kado</h2>
 			<p style={{ padding: "0 8px" }}>
 				<span className="customgift-code customgift-code-active">1</span>
@@ -42,7 +60,10 @@ const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 								.filter((boxType) => boxType.category === "Kotak Reguler")
 								.map((boxType) => (
 									<div key={boxType._id} className="customgift-card">
-										<div style={{ display: "flex", justifyContent: "center" }}>
+										<div
+											style={{ display: "flex", justifyContent: "center" }}
+											onClick={() => handleBoxClick(boxType._id)}
+										>
 											<img
 												key={boxType.images[0]}
 												src={`${baseUrl}/${boxType.images[0]}`}
@@ -79,7 +100,10 @@ const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 							.filter((boxType) => boxType.category === "Kotak Kecil")
 							.map((boxType) => (
 								<div key={boxType._id} className="customgift-card">
-									<div style={{ display: "flex", justifyContent: "center" }}>
+									<div
+										style={{ display: "flex", justifyContent: "center" }}
+										onClick={() => handleBoxClick(boxType._id)}
+									>
 										<img
 											key={boxType.images[0]}
 											src={`${baseUrl}/${boxType.images[0]}`}
@@ -115,7 +139,10 @@ const CustomGiftPage1 = ({ selectedBox, setSelectedBox, setCurrentPage }) => {
 							.filter((boxType) => boxType.category === "Kotak Besar")
 							.map((boxType) => (
 								<div key={boxType._id} className="customgift-card">
-									<div style={{ display: "flex", justifyContent: "center" }}>
+									<div
+										style={{ display: "flex", justifyContent: "center" }}
+										onClick={() => handleBoxClick(boxType._id)}
+									>
 										<img
 											key={boxType.images[0]}
 											src={`${baseUrl}/${boxType.images[0]}`}

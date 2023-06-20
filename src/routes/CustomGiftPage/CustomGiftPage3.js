@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { baseUrl } from "../../config";
+import { useNavigate } from 'react-router';
+
 
 const CustomGiftPage3 = ({
+	userData,
 	selectedBox,
+	setSelectedBox,
 	selectedProducts,
 	setSelectedProducts,
+	setCurrentPage,
 	confirmBox,
 	setConfirmBox,
 }) => {
-	const [quantity, setQuantity] = useState(1);
-	// Menghitung total harga produk yang dipilih
+	const navigate = useNavigate();
+
 	const productsTotalPrice = selectedProducts.reduce((accumulator, product) => {
 		return accumulator + product.price * product.quantity;
 	}, 0);
 
-	// Menambahkan harga dari selectedBox
-	const totalPrice = (productsTotalPrice + selectedBox.price) * quantity;
+	const totalPrice = (productsTotalPrice + selectedBox.price);
 
 	const handleSelectProduct = (product) => {
 		const existingProduct = selectedProducts.find(
@@ -37,7 +42,6 @@ const CustomGiftPage3 = ({
 
 			setSelectedProducts(updatedSelectedProducts);
 		} else {
-			// Jika produk belum ada, tambahkan produk ke selectedProducts dengan quantity 1
 			setSelectedProducts((selectedProducts) => [
 				...selectedProducts,
 				{
@@ -58,7 +62,6 @@ const CustomGiftPage3 = ({
 							quantity: selectedProduct.quantity - 1,
 						};
 					} else {
-						// Kuantitas produk sudah 1, hapus produk dari selectedProducts
 						return null;
 					}
 				}
@@ -69,29 +72,46 @@ const CustomGiftPage3 = ({
 		setSelectedProducts(updatedSelectedProducts);
 	};
 
-	const handleIncrement = () => {
-		setQuantity((prevQuantity) => prevQuantity + 1);
-	};
-
-	const handleDecrement = () => {
-		if (quantity > 1) {
-			setQuantity((prevQuantity) => prevQuantity - 1);
-		}
-	};
-
 	useEffect(() => {
 		if (confirmBox) {
-			saveData();
+			postData();
 		}
 	}, [confirmBox]);
 
-	const saveData = () => {
-		const data = {
-			selectedBox,
-			selectedProducts,
-			quantity,
-		};
-		localStorage.setItem("customBoxData", JSON.stringify(data));
+	const postData = async () => {
+		let userData = null;
+		const userDataString = localStorage.getItem("userData");
+
+		if (userDataString) {
+			userData = JSON.parse(userDataString).user;
+		} else {
+			// console.log("User data not found in localStorage.");
+		}
+		try {
+			const dataForm = {
+				user: userData,
+				boxType: selectedBox,
+				products: selectedProducts,
+			};
+
+			console.log(dataForm);
+			const response = await axios.post(`${baseUrl}/custom-packages`, {
+				user: userData._id,
+				boxType: selectedBox._id,
+				products: selectedProducts,
+			});
+			console.log("Custom package created:", response.data);
+			console.log("produk di push");
+			localStorage.removeItem("currentCustomPage");
+			localStorage.removeItem("customBox");
+			setCurrentPage(1);
+			setSelectedBox({});
+			setSelectedProducts([]);
+			setConfirmBox(false);
+			navigate('/cart');
+		} catch (error) {
+			console.error("Error creating custom package:", error);
+		}
 	};
 
 	return (
@@ -201,31 +221,6 @@ const CustomGiftPage3 = ({
 						</div>
 					</div>
 					<div className="customgiftpage3-container">
-						<div style={{ fontWeight: "bold" }}>Kuantitas Paket</div>
-						<hr />
-						<div
-							style={{
-								display: "flex",
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-						>
-							<button
-								onClick={handleDecrement}
-								className="adminpage-detail-button"
-							>
-								-
-							</button>
-							{quantity}
-							<button
-								onClick={handleIncrement}
-								className="adminpage-detail-button"
-							>
-								+
-							</button>
-						</div>
-					</div>
-					<div className="customgiftpage3-container">
 						<div style={{ fontWeight: "bold" }}>Rangkuman Total</div>
 						<hr />
 						<div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -246,10 +241,10 @@ const CustomGiftPage3 = ({
 								})}
 							</div>
 						</div>
-						<div style={{ display: "flex", justifyContent: "space-between" }}>
+						{/* <div style={{ display: "flex", justifyContent: "space-between" }}>
 							<div style={{ fontWeight: "bold" }}>Kuantitas Paket</div>
 							<div>{quantity} Paket</div>
-						</div>
+						</div> */}
 						<div style={{ display: "flex", justifyContent: "space-between" }}>
 							<h4>Harga Total</h4>
 							<h4>

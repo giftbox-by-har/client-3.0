@@ -46,7 +46,7 @@
 
 .navbar-bottom-style {
 	font-size: 0.5em;
-	width: calc(100vw / 5);
+	width: calc(100vw / 3);
 	height: inherit;
 	display: flex;
 	justify-content: center;

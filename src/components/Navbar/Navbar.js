@@ -15,21 +15,21 @@ const Navbar = () => {
 						</NavLink>
 					</div>
 					<div className="navbar-top-style-1">
-						<div>
+						{/* <div>
 							<NavLink to="/catalog" className="w-color-text">
 								Katalog
 							</NavLink>
-						</div>
+						</div> */}
 						<div>
 							<NavLink to="/customgift" className="w-color-text">
 								Buat Kado
 							</NavLink>
 						</div>
-						<div>
+						{/* <div>
 							<NavLink to="/#" className="w-color-text">
 								Rekomendasi
 							</NavLink>
-						</div>
+						</div> */}
 					</div>
 					<div className="navbar-top-style-2">
 						<div>
@@ -48,14 +48,14 @@ const Navbar = () => {
 
 			<div className="navbar-container-bottom">
 				<div className="navbar-bottom">
-					<div className="navbar-bottom-style">
+					{/* <div className="navbar-bottom-style">
 						<NavLink to="/catalog">
 							<div>
 								<FaShoppingBag size={24} color="#ffffff" />
 							</div>
 							<div className="w-color-text">Katalog</div>
 						</NavLink>
-					</div>
+					</div> */}
 					<div className="navbar-bottom-style">
 						<NavLink to="/customgift">
 							<div>
@@ -64,14 +64,14 @@ const Navbar = () => {
 							<div className="w-color-text">Buat Kado</div>
 						</NavLink>
 					</div>
-					<div className="navbar-bottom-style">
+					{/* <div className="navbar-bottom-style">
 						<NavLink to="/#">
 							<div>
 								<FaGift size={24} color="#ffffff" />
 							</div>
 							<div className="w-color-text">Rekomendasi</div>
 						</NavLink>
-					</div>
+					</div> */}
 					<div className="navbar-bottom-style">
 						<NavLink to="/cart">
 							<div>
