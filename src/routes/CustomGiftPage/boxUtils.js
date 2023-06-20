@@ -60,9 +60,9 @@ export const checkProductFitsInBox = (product, box, selectedProducts) => {
 				boxDimensions.width = boxDimensionsArray[1];
 				boxDimensions.height = boxDimensionsArray[2];
 
-				console.log(
-					`Updated box dimensions: ${boxDimensions.length} x ${boxDimensions.width} x ${boxDimensions.height}`
-				);
+				// console.log(
+				// 	`Updated box dimensions: ${boxDimensions.length} x ${boxDimensions.width} x ${boxDimensions.height}`
+				// );
 			}
 		});
 	}

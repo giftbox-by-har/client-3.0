@@ -39,10 +39,10 @@ const CustomGiftPage2 = ({
 
 			setProducts(response.data.products);
 			setRecomendations(response.data.recommendations);
-			console.log(response.data.recommendations);
+			// console.log(response.data.recommendations);
 			setIsLoading(false);
 		} catch (error) {
-			console.error(error);
+			// console.error(error);
 			setIsLoading(false);
 		}
 	};
@@ -72,7 +72,7 @@ const CustomGiftPage2 = ({
 		);
 
 		if (!fitsInBox) {
-			console.log("Selected product dimensions exceed box dimensions");
+			// console.log("Selected product dimensions exceed box dimensions");
 			return;
 		}
 
