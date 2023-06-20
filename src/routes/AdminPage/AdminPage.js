@@ -23,10 +23,9 @@ const AdminPage = ({ newToken, setNewToken }) => {
 	} else {
 		console.log("User data not found in localStorage.");
 	}
-
 	useEffect(() => {
 		if (userData && userData.userType !== "Admin") {
-			window.location.href = "/";
+			userData = null;
 		}
 	}, [userData, navigate]);
 
@@ -115,37 +114,36 @@ const AdminPage = ({ newToken, setNewToken }) => {
 			{isAuthenticated ? (
 				<div>
 					<div className="adminpage-container-bar">
-				<div>
-					<button
-						className="adminpage-container-button"
-						onClick={() => handleComponentChange("ItemsList")}
-					>
-						Daftar Barang
-					</button>
+						<div>
+							<button
+								className="adminpage-container-button"
+								onClick={() => handleComponentChange("ItemsList")}
+							>
+								Daftar Barang
+							</button>
+						</div>
+						<div>
+							<button
+								className="adminpage-container-button"
+								onClick={() => handleComponentChange("OrdersList")}
+							>
+								Daftar Pesanan
+							</button>
+						</div>
+						<div style={{ justifyContent: "flex-end" }}>
+							<button
+								className="adminpage-container-button adminpage-container-button-out"
+								onClick={handleLogout}
+							>
+								Keluar
+							</button>
+						</div>
+					</div>
+					<div className="adminpage-container-content">{renderComponent()}</div>
 				</div>
-				<div>
-					<button
-						className="adminpage-container-button"
-						onClick={() => handleComponentChange("OrdersList")}
-					>
-						Daftar Pesanan
-					</button>
-				</div>
-				<div style={{ justifyContent: "flex-end" }}>
-					<button
-						className="adminpage-container-button adminpage-container-button-out"
-						onClick={handleLogout}
-					>
-						Keluar
-					</button>
-				</div>
-			</div>
-			<div className="adminpage-container-content">{renderComponent()}</div>
-				</div>
-			):(
+			) : (
 				<Auth setIsAuthenticated={setIsAuthenticated} />
 			)}
-			
 		</div>
 	);
 };

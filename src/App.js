@@ -32,7 +32,7 @@ function App() {
 					accessToken,
 				});
 				// Token valid, pengguna terotentikasi
-				console.log(response.data);
+				// console.log(response.data);
 				localStorage.setItem("userData", JSON.stringify(response.data));
 			} catch (error) {
 				// Token tidak valid, coba refresh token
@@ -45,7 +45,7 @@ function App() {
 					});
 
 					// Token valid, pengguna terotentikasi dengan access token baru
-					console.log(response.data);
+					// console.log(response.data);
 					localStorage.setItem("userData", JSON.stringify(response.data));
 				} catch (error) {
 					// Token tidak valid, pengguna belum terotentikasi
@@ -85,8 +85,8 @@ function App() {
 
 	return (
 		<div>
-			{pathname !== "/admin" && <Navbar />}
-			<div className={pathname === "/admin" ? "" : "app-container"}>
+			{pathname !== "/adminxyz" && <Navbar />}
+			<div className={pathname === "/adminxyz" ? "" : "app-container"}>
 				<Routes>
 					<Route exact path="/" element={<HomePage />} />
 					<Route path="/catalog" element={<CatalogPage />} />
@@ -98,7 +98,7 @@ function App() {
 							<ProfilePage newToken={newToken} setNewToken={setNewToken} />
 						}
 					/>
-					<Route path="/admin" element={<AdminPage newToken={newToken} setNewToken={setNewToken}  />} />
+					<Route path="/adminxyz" element={<AdminPage newToken={newToken} setNewToken={setNewToken}  />} />
 				</Routes>
 			</div>
 		</div>

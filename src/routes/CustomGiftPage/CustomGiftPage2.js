@@ -162,7 +162,7 @@ const CustomGiftPage2 = ({
 					{products.length === 0 && (
 						<p>Produk yang Anda cari tidak ditemukan.</p>
 					)}
-					{recomendations.length > 0 && (
+					{recomendations && recomendations.length > 0 && (
 						<div>
 							<p> Rekomendasi untukmu:</p>
 							{recomendations.map((product) => (

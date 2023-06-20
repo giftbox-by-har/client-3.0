@@ -18,7 +18,7 @@ const Auth = ({ setIsAuthenticated }) => {
 			localStorage.setItem("accessToken", response.data.accessToken);
 			localStorage.setItem("refreshToken", response.data.refreshToken);
 			setIsAuthenticated(true);
-			console.log(response.data);
+			// console.log(response.data);
 		} catch (error) {
 			alert("Mohon pastikan email dan kata sandi anda benar");
 		}
@@ -34,7 +34,7 @@ const Auth = ({ setIsAuthenticated }) => {
 			// Simpan token ke local storage atau state aplikasi
 			localStorage.setItem("refreshToken", response.data.refreshToken);
 			localStorage.setItem("accessToken", response.data.accessToken);
-			console.log(response.data);
+			// console.log(response.data);
 			setIsAuthenticated(true);
 		} catch (error) {
 			console.error(error);

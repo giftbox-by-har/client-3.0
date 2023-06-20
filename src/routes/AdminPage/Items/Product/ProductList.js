@@ -23,7 +23,7 @@ const ProductList = () => {
 			const response = await axios.get("http://localhost:5000/products/", {
 				params: { search },
 			});
-			setProducts(response.data);
+			setProducts(response.data.products);
 		} catch (error) {
 			console.error(error);
 		}
